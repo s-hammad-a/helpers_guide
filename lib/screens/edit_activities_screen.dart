@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:helperguide/controllers/edit_activities_provider.dart';
 import 'package:helperguide/firebase/firebase_storage.dart';
+import 'package:helperguide/modules/activitiy.dart';
 import 'package:provider/provider.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class EditActivities extends StatelessWidget {
   const EditActivities({Key? key}) : super(key: key);
@@ -66,14 +68,23 @@ class EditActivities extends StatelessWidget {
                                 height: 200,
                                 width: 300,
                                 child: IconButton(
-                                  icon: Image.asset(
-                                    "assets/placeholder.png",
+                                  icon: context.watch<EditActivitiesProvider>().tempImage == "assets/placeholder.png" ? Image.asset(
+                                    context.watch<EditActivitiesProvider>().tempImage,
+                                    fit: BoxFit.fill,
+                                    height: 200,
+                                  ) : Image.network(
+                                    context.watch<EditActivitiesProvider>().tempImage,
                                     fit: BoxFit.fill,
                                     height: 200,
                                   ),
-                                  onPressed: () {
+                                  onPressed: () async {
                                     StorageManager sm = StorageManager();
-                                    sm.uploadFile();
+                                    String? location = await sm.uploadFile();
+                                    print("location");
+                                    if(location != null) {
+                                      print(location);
+                                      Provider.of<EditActivitiesProvider>(context, listen: false).setImage(location);
+                                    }
                                   },
                                 ),
                               ),
@@ -138,7 +149,7 @@ class EditActivities extends StatelessWidget {
             child: ListView.builder(
               itemCount: context.watch<EditActivitiesProvider>().activities.length,
               itemBuilder: (BuildContext context, int index) {
-                return ActivityCard(activity: Provider.of<EditActivitiesProvider>(context, listen: false).activities[index]);
+                return ActivityCard(activity: Provider.of<EditActivitiesProvider>(context, listen: false).activities[index], index: index,);
               },
             ),
           ),
@@ -150,19 +161,23 @@ class EditActivities extends StatelessWidget {
 }
 
 class ActivityCard extends StatelessWidget {
-  const ActivityCard({Key? key, required this.activity}) : super(key: key);
-  final Map activity;
+  const ActivityCard({Key? key, required this.activity, required this.index}) : super(key: key);
+  final Activity activity;
+  final int index;
 
   @override
   Widget build(BuildContext context) {
     return Card(
       child: TextButton(
         onPressed: () {
-
+          launchUrl(Uri.parse(activity.link));
+        },
+        onLongPress: () {
+          Provider.of<EditActivitiesProvider>(context, listen: false).deleteActivity(index);
         },
         child: Image.network(
-          activity["image"],
-          fit: BoxFit.fill,
+          activity.image,
+          fit: BoxFit.fitWidth,
           height: 200,
         ),
       ),
