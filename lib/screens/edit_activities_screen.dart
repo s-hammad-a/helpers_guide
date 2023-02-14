@@ -1,3 +1,6 @@
+import 'dart:typed_data';
+
+import 'package:file_picker_cross/file_picker_cross.dart';
 import 'package:flutter/material.dart';
 import 'package:helperguide/controllers/edit_activities_provider.dart';
 import 'package:helperguide/firebase/firebase_storage.dart';
@@ -49,16 +52,20 @@ class EditActivities extends StatelessWidget {
                 ),
               ),
               const Expanded(child: SizedBox.shrink()),
-              IconButton(
+              context.watch<EditActivitiesProvider>().activities.length < 5 ? IconButton(
                 splashRadius: 25,
                 padding: EdgeInsets.zero,
                 icon: const Icon(
                   Icons.edit,
                 ),
                 onPressed: () {
+                  String image = " ";
+                  Uint8List fileBytes = Uint8List.fromList([]);
+                  String fileName = " ";
+                  Provider.of<EditActivitiesProvider>(context, listen: false).imageLoaded = false;
                   showDialog(
                     context: context,
-                    builder: (BuildContext context) {
+                    builder: (BuildContext newContext) {
                       return AlertDialog(
                         content: SizedBox(
                           height: 350,
@@ -68,23 +75,20 @@ class EditActivities extends StatelessWidget {
                                 height: 200,
                                 width: 300,
                                 child: IconButton(
-                                  icon: context.watch<EditActivitiesProvider>().tempImage == "assets/placeholder.png" ? Image.asset(
-                                    context.watch<EditActivitiesProvider>().tempImage,
+                                  icon: !newContext.watch<EditActivitiesProvider>().imageLoaded ? Image.asset(
+                                    "assets/placeholder.png",
                                     fit: BoxFit.fill,
                                     height: 200,
-                                  ) : Image.network(
-                                    context.watch<EditActivitiesProvider>().tempImage,
+                                  ) : Image.memory(
+                                    newContext.watch<EditActivitiesProvider>().tempImage,
                                     fit: BoxFit.fill,
                                     height: 200,
                                   ),
                                   onPressed: () async {
-                                    StorageManager sm = StorageManager();
-                                    String? location = await sm.uploadFile();
-                                    print("location");
-                                    if(location != null) {
-                                      print(location);
-                                      Provider.of<EditActivitiesProvider>(context, listen: false).setImage(location);
-                                    }
+                                    FilePickerCross myFile = await FilePickerCross.importFromStorage();
+                                    fileBytes = myFile.toUint8List();
+                                    fileName = myFile.fileName!;
+                                    Provider.of<EditActivitiesProvider>(newContext, listen: false).setPlaceHolder(fileBytes);
                                   },
                                 ),
                               ),
@@ -96,6 +100,7 @@ class EditActivities extends StatelessWidget {
                                     color: Colors.black,
                                     fontSize: 18.0,
                                   ),
+                                  controller: context.watch<EditActivitiesProvider>().linkController,
                                   cursorColor: Colors.black,
                                   textAlignVertical: TextAlignVertical.center,
                                   decoration: const InputDecoration(
@@ -118,8 +123,19 @@ class EditActivities extends StatelessWidget {
                               SizedBox(
                                 width: 250,
                                 child: TextButton(
-                                  onPressed: () {
-                                    Navigator.pop(context);
+                                  onPressed: () async {
+                                    if(Provider.of<EditActivitiesProvider>(context, listen: false).imageLoaded){
+                                      Navigator.pop(context);
+                                    }
+                                    StorageManager sm = StorageManager();
+                                    String? location = await sm.uploadFile(fileName, fileBytes);
+                                    print("location");
+                                    if(location != null) {
+                                      print(location);
+                                      image = location;
+                                      Provider.of<EditActivitiesProvider>(context, listen: false).addLink(image);
+                                      Provider.of<EditActivitiesProvider>(context, listen: false).addToDatabase();
+                                    }
                                   },
                                   style: const ButtonStyle(
                                     backgroundColor: MaterialStatePropertyAll(Color(0xFF151A4F),)
@@ -141,17 +157,28 @@ class EditActivities extends StatelessWidget {
                     },
                   );
                 },
-              ),
+              ) : const SizedBox.shrink(),
               const SizedBox(width: 10,),
             ],
           ),
-          Expanded(
-            child: ListView.builder(
-              itemCount: context.watch<EditActivitiesProvider>().activities.length,
-              itemBuilder: (BuildContext context, int index) {
-                return ActivityCard(activity: Provider.of<EditActivitiesProvider>(context, listen: false).activities[index], index: index,);
-              },
-            ),
+          FutureBuilder(
+            future: Provider.of<EditActivitiesProvider>(context, listen: false).getFromDatabase(),
+            builder: (BuildContext context, AsyncSnapshot<dynamic> snapshot) {
+              if(snapshot.connectionState == ConnectionState.done) {
+                return Expanded(
+                  child: ListView.builder(
+                    itemCount: context.watch<EditActivitiesProvider>().activities.length,
+                    itemBuilder: (BuildContext context, int index) {
+                      return ActivityCard(activity: Provider.of<EditActivitiesProvider>(context, listen: false).activities[index], index: index,);
+                    },
+                  ),
+                );
+              }
+              else {
+                return const SizedBox.shrink();
+              }
+            },
+
           ),
           const SizedBox(height: 10,),
         ],

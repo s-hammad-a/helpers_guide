@@ -2,16 +2,20 @@ import 'dart:typed_data';
 import 'package:file_picker_cross/file_picker_cross.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
+import 'package:flutter/cupertino.dart';
+import 'package:helperguide/controllers/edit_activities_provider.dart';
+import 'package:permission_handler/permission_handler.dart';
+import 'package:provider/provider.dart';
 
 class StorageManager
 {
-  Future<String?> uploadFile() async {
+  Future<String?> uploadFile(String fileName, Uint8List fileBytes) async {
     await FirebaseAuth.instance.signInAnonymously();
-    FilePickerCross myFile = await FilePickerCross.importFromStorage();
-    // FilePickerResult? result = await FilePicker.platform.pickFiles(type: FileType.image);
+    print(await Permission.storage.request());
+    print(await Permission.photos.request());
+    print(await Permission.accessMediaLocation.request());
+    print(await Permission.manageExternalStorage.request());
     String? location;
-    Uint8List fileBytes = myFile.toUint8List();
-    String fileName = myFile.fileName!;
 
     // Upload file
     TaskSnapshot snapshot =  await FirebaseStorage.instance.ref('uploads/$fileName').putData(fileBytes);

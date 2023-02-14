@@ -189,41 +189,35 @@ class HomeScreen extends StatelessWidget {
                   ),
                 ),
               ),
-              Padding(
-                padding: const EdgeInsets.fromLTRB(30, 10, 30, 10),
-                child: Container(
-                  decoration: BoxDecoration(
-                      border: Border.all(color: Colors.black)
-                  ),
-                  height: 200,
-                  child: Swiper.children(
-                    indicatorLayout: PageIndicatorLayout.COLOR,
-                    autoplay: true,
-                    pagination: const SwiperPagination(),
-                    children: [
-                      Image.asset(
-                        "assets/pic1.jpeg",
-                        fit: BoxFit.fill,
+              FutureBuilder(
+                future: Provider.of<HomeScreenProvider>(context).getFromDatabase(),
+                builder: (BuildContext context, AsyncSnapshot<dynamic> snapshot) {
+                  if(snapshot.connectionState == ConnectionState.done) {
+                    return Padding(
+                      padding: const EdgeInsets.fromLTRB(30, 10, 30, 10),
+                      child: Container(
+                        decoration: BoxDecoration(
+                            border: Border.all(color: Colors.black)
+                        ),
+                        height: 200,
+                        child: Swiper.children(
+                          indicatorLayout: PageIndicatorLayout.COLOR,
+                          autoplay: true,
+                          pagination: const SwiperPagination(),
+                          children: Provider.of<HomeScreenProvider>(context, listen: false).activities.map((e) {
+                            return Image.network(
+                              e.image,
+                              fit: BoxFit.fill,
+                            );
+                          }).toList(),
+                        ),
                       ),
-                      Image.asset(
-                        "assets/pic2.jpeg",
-                        fit: BoxFit.fill,
-                      ),
-                      Image.asset(
-                        "assets/pic3.jpeg",
-                        fit: BoxFit.fill,
-                      ),
-                      Image.asset(
-                        "assets/pic4.jpeg",
-                        fit: BoxFit.fill,
-                      ),
-                      Image.asset(
-                        "assets/pic5.jpeg",
-                        fit: BoxFit.fill,
-                      ),
-                    ],
-                  ),
-                ),
+                    );
+                  }
+                  else {
+                    return const SizedBox(height: 200,);
+                  }
+                },
               ),
               Padding(
                 padding: const EdgeInsets.fromLTRB(30, 10, 30, 10),
