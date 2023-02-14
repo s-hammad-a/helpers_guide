@@ -2,14 +2,16 @@ import 'dart:typed_data';
 
 import 'package:file_picker_cross/file_picker_cross.dart';
 import 'package:flutter/material.dart';
-import 'package:helperguide/controllers/edit_activities_provider.dart';
+import 'package:helperguide/controllers/edit_university_provider.dart';
 import 'package:helperguide/firebase/firebase_storage.dart';
-import 'package:helperguide/modules/activitiy.dart';
+import 'package:helperguide/modules/university_activitiy.dart';
 import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-class EditActivities extends StatelessWidget {
-  const EditActivities({Key? key}) : super(key: key);
+import '../modules/university_activitiy.dart';
+
+class EditUniversity extends StatelessWidget {
+  const EditUniversity({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -29,7 +31,7 @@ class EditActivities extends StatelessWidget {
               children: const [
                 Expanded(child: SizedBox.shrink()),
                 Text(
-                  " Edit Activities",
+                  " Edit University Information",
                   style: TextStyle(
                       color: Colors.white,
                       fontSize: 20,
@@ -44,7 +46,7 @@ class EditActivities extends StatelessWidget {
           Row(
             children: [
               const Text(
-                " Activities Visible to user",
+                " University Information",
                 style: TextStyle(
                     color: Colors.black,
                     fontSize: 20,
@@ -52,7 +54,7 @@ class EditActivities extends StatelessWidget {
                 ),
               ),
               const Expanded(child: SizedBox.shrink()),
-              context.watch<EditActivitiesProvider>().activities.length < 5 ? IconButton(
+              context.watch<EditUniversityProvider>().activities.length < 4 ? IconButton(
                 splashRadius: 25,
                 padding: EdgeInsets.zero,
                 icon: const Icon(
@@ -62,25 +64,25 @@ class EditActivities extends StatelessWidget {
                   String image = " ";
                   Uint8List fileBytes = Uint8List.fromList([]);
                   String fileName = " ";
-                  Provider.of<EditActivitiesProvider>(context, listen: false).imageLoaded = false;
+                  Provider.of<EditUniversityProvider>(context, listen: false).imageLoaded = false;
                   showDialog(
                     context: context,
                     builder: (BuildContext newContext) {
                       return AlertDialog(
                         content: SizedBox(
-                          height: 350,
+                          height: 450,
                           child: Column(
                             children: [
                               SizedBox(
                                 height: 200,
                                 width: 300,
                                 child: IconButton(
-                                  icon: !newContext.watch<EditActivitiesProvider>().imageLoaded ? Image.asset(
+                                  icon: !newContext.watch<EditUniversityProvider>().imageLoaded ? Image.asset(
                                     "assets/placeholder.png",
                                     fit: BoxFit.fill,
                                     height: 200,
                                   ) : Image.memory(
-                                    newContext.watch<EditActivitiesProvider>().tempImage,
+                                    newContext.watch<EditUniversityProvider>().tempImage,
                                     fit: BoxFit.fill,
                                     height: 200,
                                   ),
@@ -88,8 +90,37 @@ class EditActivities extends StatelessWidget {
                                     FilePickerCross myFile = await FilePickerCross.importFromStorage();
                                     fileBytes = myFile.toUint8List();
                                     fileName = myFile.fileName!;
-                                    Provider.of<EditActivitiesProvider>(newContext, listen: false).setPlaceHolder(fileBytes);
+                                    Provider.of<EditUniversityProvider>(newContext, listen: false).setPlaceHolder(fileBytes);
                                   },
+                                ),
+                              ),
+                              const SizedBox(height: 5,),
+                              SizedBox(
+                                width: 300,
+                                child: TextFormField(
+                                  maxLines: 1,
+                                  maxLength: 20,
+                                  style: const TextStyle(
+                                    color: Colors.black,
+                                    fontSize: 18.0,
+                                  ),
+                                  controller: context.watch<EditUniversityProvider>().aboutController,
+                                  cursorColor: Colors.black,
+                                  textAlignVertical: TextAlignVertical.center,
+                                  decoration: const InputDecoration(
+                                    filled: true,
+                                    fillColor: Colors.white,
+                                    enabledBorder: OutlineInputBorder(
+                                      borderSide: BorderSide(color: Color(0xFFA1C3FC), width: 1.0),
+                                      borderRadius: BorderRadius.all(Radius.circular(10)),
+                                    ),
+                                    hintText: "about",
+                                    hintStyle: TextStyle(
+                                        fontSize: 18,
+                                        color: Colors.black,
+                                        letterSpacing: 0.5
+                                    ),
+                                  ),
                                 ),
                               ),
                               SizedBox(
@@ -100,7 +131,7 @@ class EditActivities extends StatelessWidget {
                                     color: Colors.black,
                                     fontSize: 18.0,
                                   ),
-                                  controller: context.watch<EditActivitiesProvider>().linkController,
+                                  controller: context.watch<EditUniversityProvider>().linkController,
                                   cursorColor: Colors.black,
                                   textAlignVertical: TextAlignVertical.center,
                                   decoration: const InputDecoration(
@@ -124,7 +155,7 @@ class EditActivities extends StatelessWidget {
                                 width: 250,
                                 child: TextButton(
                                   onPressed: () async {
-                                    if(Provider.of<EditActivitiesProvider>(context, listen: false).imageLoaded){
+                                    if(Provider.of<EditUniversityProvider>(context, listen: false).imageLoaded){
                                       Navigator.pop(context);
                                     }
                                     StorageManager sm = StorageManager();
@@ -133,15 +164,15 @@ class EditActivities extends StatelessWidget {
                                     if(location != null) {
                                       print(location);
                                       image = location;
-                                      Provider.of<EditActivitiesProvider>(context, listen: false).addLink(image);
-                                      Provider.of<EditActivitiesProvider>(context, listen: false).addToDatabase();
+                                      Provider.of<EditUniversityProvider>(context, listen: false).addLink(image);
+                                      Provider.of<EditUniversityProvider>(context, listen: false).addToDatabase();
                                     }
                                   },
                                   style: const ButtonStyle(
-                                    backgroundColor: MaterialStatePropertyAll(Color(0xFF151A4F),)
+                                      backgroundColor: MaterialStatePropertyAll(Color(0xFF151A4F),)
                                   ),
                                   child: const Text(
-                                    "Add new Activity",
+                                    "Add new Information",
                                     textAlign: TextAlign.center,
                                     style: TextStyle(
                                       color: Colors.white,
@@ -163,9 +194,9 @@ class EditActivities extends StatelessWidget {
           ),
           Expanded(
             child: ListView.builder(
-              itemCount: context.watch<EditActivitiesProvider>().activities.length,
+              itemCount: context.watch<EditUniversityProvider>().activities.length,
               itemBuilder: (BuildContext context, int index) {
-                return ActivityCard(activity: Provider.of<EditActivitiesProvider>(context, listen: false).activities[index], index: index,);
+                return UniversityActivityCard(universityActivity: Provider.of<EditUniversityProvider>(context, listen: false).activities[index], index: index,);
               },
             ),
           ),
@@ -176,9 +207,9 @@ class EditActivities extends StatelessWidget {
   }
 }
 
-class ActivityCard extends StatelessWidget {
-  const ActivityCard({Key? key, required this.activity, required this.index}) : super(key: key);
-  final Activity activity;
+class UniversityActivityCard extends StatelessWidget {
+  const UniversityActivityCard({Key? key, required this.universityActivity, required this.index}) : super(key: key);
+  final UniversityActivity universityActivity;
   final int index;
 
   @override
@@ -186,7 +217,7 @@ class ActivityCard extends StatelessWidget {
     return Card(
       child: TextButton(
         onPressed: () {
-          launchUrl(Uri.parse(activity.link));
+          launchUrl(Uri.parse(universityActivity.link));
         },
         onLongPress: () async {
           await showDialog(
@@ -211,7 +242,7 @@ class ActivityCard extends StatelessWidget {
                 actions: [
                   ElevatedButton(
                     onPressed: () async {
-                      Provider.of<EditActivitiesProvider>(context, listen: false).deleteActivity(index);
+                      Provider.of<EditUniversityProvider>(context, listen: false).deleteUniversityActivity(index);
                       Navigator.pop(context);
                     },
                     child: const Text('Confirm'),
@@ -227,11 +258,30 @@ class ActivityCard extends StatelessWidget {
             },
           );
         },
-        child: Image.network(
-          activity.image,
-          fit: BoxFit.fitWidth,
-          height: 200,
-        ),
+        child: Stack(
+          alignment: Alignment.center,
+          children: [
+            Image.network(
+              universityActivity.image,
+              fit: BoxFit.fitWidth,
+              height: 200,
+              color: Colors.blueGrey,
+              colorBlendMode: BlendMode.dst,
+            ),
+            Text(
+              universityActivity.about,
+              style: TextStyle(
+                fontSize: 15,
+                background: Paint()
+                  ..color = Colors.white54,
+                foreground: Paint()
+                  ..style = PaintingStyle.stroke
+                  ..strokeWidth = 1
+                  ..color = Colors.black,
+              ),
+            )
+          ],
+        )
       ),
     );
   }

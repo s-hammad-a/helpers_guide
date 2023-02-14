@@ -3,29 +3,26 @@ import 'dart:typed_data';
 
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/cupertino.dart';
-import 'package:helperguide/modules/activitiy.dart';
+import 'package:helperguide/modules/university_activitiy.dart';
 
-class EditActivitiesProvider extends ChangeNotifier{
-  List<Activity> activities = [];
-  final DatabaseReference activitiesRef = FirebaseDatabase.instance.reference().child('activities/');
+class EditUniversityProvider extends ChangeNotifier{
+  List<UniversityActivity> activities = [];
+  final DatabaseReference activitiesRef = FirebaseDatabase.instance.reference().child('university');
   late Uint8List tempImage ;
   bool imageLoaded = false;
   TextEditingController linkController = TextEditingController();
+  TextEditingController aboutController = TextEditingController();
 
   void setPlaceHolder(Uint8List image) {
     tempImage = image;
     imageLoaded = true;
     notifyListeners();
   }
-  void setImage(String image) {
-    // activitiesRef.limitToFirst(5);
-    activities.add(Activity(image: image, link: ""));
-  }
   void addLink(String image) {
-    activities.add(Activity(image: image, link: linkController.text));
+    activities.add(UniversityActivity(image: image, about: aboutController.text, link: linkController.text));
     notifyListeners();
   }
-  void deleteActivity(int index) {
+  void deleteUniversityActivity(int index) {
     activities.removeAt(index);
     activitiesRef.remove();
     for(int i = 0; i < activities.length; i++) {
@@ -41,7 +38,7 @@ class EditActivitiesProvider extends ChangeNotifier{
     Query query = activitiesRef;
     query.once().then((value) {
       for (var element in value.snapshot.children) {
-        activities.add(Activity.fromJson(element.value as Map));
+        activities.add(UniversityActivity.fromJson(element.value as Map));
       }
     });
   }

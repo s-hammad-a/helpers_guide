@@ -1,7 +1,14 @@
 import 'package:card_swiper/card_swiper.dart';
 import 'package:flutter/material.dart';
+import 'package:helperguide/controllers/edit_activities_provider.dart';
+import 'package:helperguide/controllers/edit_events_provider.dart';
 import 'package:helperguide/controllers/home_screen_provider.dart';
 import 'package:provider/provider.dart';
+import 'package:url_launcher/url_launcher.dart';
+
+import '../controllers/edit_university_provider.dart';
+import '../modules/university_activitiy.dart';
+import 'edit_events.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({Key? key}) : super(key: key);
@@ -189,35 +196,9 @@ class HomeScreen extends StatelessWidget {
                   ),
                 ),
               ),
-              FutureBuilder(
-                future: Provider.of<HomeScreenProvider>(context).getFromDatabase(),
-                builder: (BuildContext context, AsyncSnapshot<dynamic> snapshot) {
-                  if(snapshot.connectionState == ConnectionState.done) {
-                    return Padding(
-                      padding: const EdgeInsets.fromLTRB(30, 10, 30, 10),
-                      child: Container(
-                        decoration: BoxDecoration(
-                            border: Border.all(color: Colors.black)
-                        ),
-                        height: 200,
-                        child: Swiper.children(
-                          indicatorLayout: PageIndicatorLayout.COLOR,
-                          autoplay: true,
-                          pagination: const SwiperPagination(),
-                          children: Provider.of<HomeScreenProvider>(context, listen: false).activities.map((e) {
-                            return Image.network(
-                              e.image,
-                              fit: BoxFit.fill,
-                            );
-                          }).toList(),
-                        ),
-                      ),
-                    );
-                  }
-                  else {
-                    return const SizedBox(height: 200,);
-                  }
-                },
+              const Padding(
+                padding: EdgeInsets.fromLTRB(30, 10, 30, 10),
+                child: CardSwipe(),
               ),
               Padding(
                 padding: const EdgeInsets.fromLTRB(30, 10, 30, 10),
@@ -241,91 +222,14 @@ class HomeScreen extends StatelessWidget {
                           Icons.edit,
                         ),
                         onPressed: () {
-
+                          Navigator.pushNamed(context, "/editUniversity");
                         },
                       ),
                     ],
                   ),
                 ),
               ),
-              Padding(
-                  padding: const EdgeInsets.fromLTRB(30, 10, 30, 0),
-                  child: SizedBox(
-                    height: 100,
-                    child: Row(
-                      crossAxisAlignment: CrossAxisAlignment.stretch,
-                      children: [
-                        Expanded(
-                          child: TextButton(
-                              onPressed: () {  },
-                              style: const ButtonStyle(
-                                backgroundColor: MaterialStatePropertyAll(Color(0x55DB3231)),
-                              ),
-                              child: Stack(
-                                alignment: Alignment.center,
-                                children: [
-                                  Image.asset("assets/about university.png", color: Colors.blueGrey, colorBlendMode: BlendMode.dst,),
-                                  const Text(
-                                    "About University",
-                                    style: TextStyle(
-                                      color: Colors.white,
-                                      fontSize: 15,
-                                    ),
-                                  )
-                                ],
-                              )
-                          ),
-                        ),
-                        Expanded(
-                          child: TextButton(
-                              style: const ButtonStyle(
-                                padding: MaterialStatePropertyAll(EdgeInsets.zero),
-                              ),
-                              onPressed: () {  },
-                              child: Stack(
-                                alignment: Alignment.center,
-                                children: [
-                                  Image.asset("assets/colleges.jpeg",),
-                                  const Text(
-                                    "About University",
-                                    style: TextStyle(
-                                      color: Colors.white,
-                                      fontSize: 15,
-                                    ),
-                                  )
-                                ],
-                              )
-                          ),
-                        ),
-                      ],
-                    ),
-                  )
-              ),
-              Padding(
-                padding: const EdgeInsets.fromLTRB(30, 10, 30, 10),
-                child: SizedBox(
-                  height: 80,
-                  child: TextButton(
-                      style: const ButtonStyle(
-                        padding: MaterialStatePropertyAll(EdgeInsets.zero),
-                      ),
-                      onPressed: () {  },
-                      child: Stack(
-                        alignment: Alignment.center,
-                        children: [
-                          Image.asset("assets/university majors.jpeg",),
-                          const Text(
-                            "University Majors",
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontSize: 15,
-                            ),
-                          )
-                        ],
-                      )
-                  ),
-                ),
-              ),
+              const UniversityInformation(),
             ],
           ),
           Column(
@@ -337,7 +241,7 @@ class HomeScreen extends StatelessWidget {
                   color: Color(0xFF428DFC),
                   borderRadius: BorderRadius.only(bottomLeft: Radius.circular(30), bottomRight: Radius.circular(30)),
                 ),
-                height: MediaQuery.of(context).size.height/4.5,
+                height: MediaQuery.of(context).size.height/4,
                 width: double.maxFinite,
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -346,40 +250,99 @@ class HomeScreen extends StatelessWidget {
                     Row(
                       crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
-                        const Text(
-                          " September",
-                          style: TextStyle(
+                        Text(
+                          context.watch<HomeScreenProvider>().months[context.watch<HomeScreenProvider>().current.month],
+                          style: const TextStyle(
                             color: Colors.white,
                             fontSize: 20,
                             fontWeight: FontWeight.bold,
                           ),
                         ),
                         IconButton(
-                          onPressed: () {  },
-                          icon: const RotatedBox(
-                            quarterTurns: 3,
-                            child: Icon(
-                              Icons.arrow_back_ios_new,
-                              color: Colors.white,
-                              size: 20,
-                            ),
+                          onPressed: () async {
+                            DateTime? temp = await showDatePicker(
+                              context: context,
+                              initialDate: Provider.of<HomeScreenProvider>(context, listen: false).current,
+                              firstDate: DateTime.now().subtract(const Duration(days: 365)),
+                              lastDate: DateTime.now().add(const Duration(days: 365)),
+                            );
+                            Provider.of<HomeScreenProvider>(context, listen: false).setCurrentDate(temp!);
+                          },
+                          icon: const Icon(
+                            Icons.edit,
+                            color: Colors.white,
+                            size: 20,
                           ),
                         ),
                       ],
                     ),
-                    const SizedBox(height: 30,),
+                    const SizedBox(height: 10,),
+                    SizedBox(
+                      height: 60,
+                      child: ListView.builder(
+                        itemExtent: 65,
+                        controller: context.watch<HomeScreenProvider>().scrollController,
+                        padding: EdgeInsets.zero,
+                        scrollDirection: Axis.horizontal,
+                        itemCount: Provider.of<HomeScreenProvider>(context, listen: false).getNumberOfDays(),
+                        itemBuilder: (BuildContext context, int index) {
+                          return Row(
+                            children: [
+                              FloatingActionButton(
+                                focusNode: context.watch<HomeScreenProvider>().current.day == index + 1 ? context.watch<HomeScreenProvider>().focusNode : FocusNode(),
+                                shape: OutlineInputBorder(
+                                  borderSide: const BorderSide(color: Colors.black, width: 1),
+                                  borderRadius: BorderRadius.circular(200)
+                                ),
+                                backgroundColor: context.watch<HomeScreenProvider>().current.day == index + 1 ? Colors.red : Colors.white,
+                                onPressed: () {
+                                  Provider.of<HomeScreenProvider>(context, listen: false).setChangeDate(index+1);
+                                },
+                                child: Text(
+                                  (index+1).toString(),
+                                  style: const TextStyle(
+                                    color: Colors.black,
+                                  ),
+                                ),
+                              ),
+                              const SizedBox(width: 5,)
+                            ],
+                          );
+                        },
+
+                      ),
+
+                    )
                   ],
                 ),
               ),
               const SizedBox(height: 10,),
-              const Padding(
-                padding: EdgeInsets.fromLTRB(30, 10, 30, 0),
-                child: Text(
-                  "Events of 15 September",
-                  style: TextStyle(
-                      color: Colors.black,
-                      fontSize: 15,
-                      fontWeight: FontWeight.bold
+              Padding(
+                padding: const EdgeInsets.fromLTRB(30, 10, 30, 0),
+                child: SizedBox(
+                  height: 30,
+                  child: Row(
+                    children: [
+                      Text(
+                        "Events of ${context.watch<HomeScreenProvider>().current.day} ${context.watch<HomeScreenProvider>().months[context.watch<HomeScreenProvider>().current.month]}",
+                        style: const TextStyle(
+                            color: Colors.black,
+                            fontSize: 15,
+                            fontWeight: FontWeight.bold
+                        ),
+                      ),
+                      const Expanded(child: SizedBox.shrink()),
+                      IconButton(
+                        splashRadius: 25,
+                        padding: EdgeInsets.zero,
+                        icon: const Icon(
+                          Icons.edit,
+                        ),
+                        onPressed: () {
+                          Navigator.pushNamed(context, "/editEvents");
+                        },
+                      ),
+                    ],
                   ),
                 ),
               ),
@@ -387,11 +350,11 @@ class HomeScreen extends StatelessWidget {
                 child: Padding(
                   padding: const EdgeInsets.fromLTRB(30, 0, 30, 10),
                   child: ListView.builder(
-                    itemCount: 3,
+                    itemCount: context.watch<EditEventsProvider>().events.length,
                     itemBuilder: (BuildContext context, int index) {
-                      return const Padding(
-                        padding: EdgeInsets.all(5.0),
-                        child: EventCard(),
+                      return Padding(
+                        padding: const EdgeInsets.all(5.0),
+                        child: EventCard(event: context.watch<EditEventsProvider>().events[index], index: index,),
                       );
                     },
                   ),
@@ -511,55 +474,6 @@ class HomeScreen extends StatelessWidget {
     );
   }
 }
-class EventCard extends StatelessWidget {
-  const EventCard({Key? key}) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.all(8),
-      decoration: const BoxDecoration(
-        borderRadius: BorderRadius.all(Radius.circular(20)),
-        color: Color(0xFFA1C3FC),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: const [
-          SizedBox(height: 5,),
-          Text(
-            "مبادرة الاثراء الرقمي",
-            style: TextStyle(
-              color: Colors.black,
-              fontSize: 15,
-              fontWeight: FontWeight.bold
-            ),
-            textAlign: TextAlign.end,
-          ),
-          SizedBox(height: 5,),
-          Text(
-            "وكالة الجامعة للشؤون الاكاديمية",
-            style: TextStyle(
-              color: Colors.black,
-              fontSize: 15,
-            ),
-            textAlign: TextAlign.end,
-          ),
-          SizedBox(height: 10,),
-          Text(
-            "08:30 AM - 09:30 AM",
-            style: TextStyle(
-              color: Colors.black,
-              fontSize: 15,
-              fontWeight: FontWeight.bold
-            ),
-            textAlign: TextAlign.end,
-          ),
-          SizedBox(height: 5,),
-        ],
-      ),
-    );
-  }
-}
 
 class LocationCard extends StatelessWidget {
   const LocationCard({Key? key}) : super(key: key);
@@ -597,3 +511,118 @@ class LocationCard extends StatelessWidget {
   }
 }
 
+
+class UniversityActivityCard extends StatelessWidget {
+  const UniversityActivityCard({Key? key, required this.universityActivity, required this.index}) : super(key: key);
+  final UniversityActivity universityActivity;
+  final int index;
+
+  @override
+  Widget build(BuildContext context) {
+    return Card(
+      child: TextButton(
+          onPressed: () {
+            launchUrl(Uri.parse(universityActivity.link));
+          },
+          onLongPress: () {
+            Provider.of<EditUniversityProvider>(context, listen: false).deleteUniversityActivity(index);
+          },
+          child: Stack(
+            alignment: Alignment.center,
+            children: [
+              Image.network(
+                universityActivity.image,
+                fit: BoxFit.fill,
+                color: Colors.blueGrey,
+                colorBlendMode: BlendMode.dst,
+              ),
+              Text(
+                universityActivity.about,
+                style: TextStyle(
+                  fontSize: 15,
+                  background: Paint()
+                    ..color = Colors.white54,
+                  foreground: Paint()
+                    ..style = PaintingStyle.stroke
+                    ..strokeWidth = 1
+                    ..color = Colors.black,
+                ),
+              )
+            ],
+          )
+      ),
+    );
+  }
+}
+
+class UniversityInformation extends StatelessWidget {
+  const UniversityInformation({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        context.watch<EditUniversityProvider>().activities.isNotEmpty ? Padding(
+            padding: const EdgeInsets.fromLTRB(30, 10, 30, 0),
+            child: SizedBox(
+              height: 100,
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  Expanded(
+                    child: UniversityActivityCard(universityActivity: context.watch<EditUniversityProvider>().activities[0], index: 0),
+                  ),
+                  context.watch<EditUniversityProvider>().activities.length > 1 ? Expanded(
+                    child: UniversityActivityCard(universityActivity: context.watch<EditUniversityProvider>().activities[1], index: 1),
+                  ) : const SizedBox.shrink(),
+                ],
+              ),
+            )
+        ) : const SizedBox.shrink(),
+        context.watch<EditUniversityProvider>().activities.length > 2 ? Padding(
+            padding: const EdgeInsets.fromLTRB(30, 10, 30, 0),
+            child: SizedBox(
+              height: 100,
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  Expanded(
+                    child: UniversityActivityCard(universityActivity: context.watch<EditUniversityProvider>().activities[2], index: 2),
+                  ),
+                  context.watch<EditUniversityProvider>().activities.length > 3 ? Expanded(
+                    child: UniversityActivityCard(universityActivity: context.watch<EditUniversityProvider>().activities[3], index: 3),
+                  ) : const SizedBox.shrink(),
+                ],
+              ),
+            )
+        ) : const SizedBox.shrink(),
+      ],
+    );
+  }
+}
+
+class CardSwipe extends StatelessWidget {
+  const CardSwipe({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      decoration: BoxDecoration(
+          border: Border.all(color: Colors.black)
+      ),
+      height: 200,
+      child: Swiper.children(
+        indicatorLayout: PageIndicatorLayout.COLOR,
+        autoplay: true,
+        pagination: const SwiperPagination(),
+        children: Provider.of<HomeScreenProvider>(context, listen: false).activities.map((e) {
+          return Image.network(
+            e.image,
+            fit: BoxFit.fill,
+          );
+        }).toList(),
+      ),
+    );
+  }
+}

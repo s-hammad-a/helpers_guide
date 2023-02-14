@@ -1,10 +1,20 @@
 import 'package:flutter/material.dart';
+import 'package:helperguide/controllers/edit_events_provider.dart';
+import 'package:helperguide/controllers/home_screen_provider.dart';
+import 'package:provider/provider.dart';
+
+import '../controllers/edit_activities_provider.dart';
+import '../controllers/edit_university_provider.dart';
 
 class IntroScreen extends StatelessWidget {
   const IntroScreen({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
+    Provider.of<EditUniversityProvider>(context, listen: false).getFromDatabase();
+    Provider.of<EditActivitiesProvider>(context, listen: false).getFromDatabase();
+    Provider.of<HomeScreenProvider>(context, listen: false).getFromDatabase();
+    Provider.of<EditEventsProvider>(context, listen: false).getFromDatabase();
     return Scaffold(
       body: Container(
         color: Colors.white,

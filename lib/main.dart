@@ -1,8 +1,12 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:helperguide/controllers/edit_activities_provider.dart';
+import 'package:helperguide/controllers/edit_events_provider.dart';
+import 'package:helperguide/controllers/edit_university_provider.dart';
 import 'package:helperguide/controllers/home_screen_provider.dart';
 import 'package:helperguide/screens/edit_activities_screen.dart';
+import 'package:helperguide/screens/edit_events.dart';
+import 'package:helperguide/screens/edit_university_screen.dart';
 import 'package:helperguide/screens/home_screen.dart';
 import 'package:helperguide/screens/intro_screen.dart';
 import 'package:helperguide/screens/signin_screen.dart';
@@ -25,6 +29,8 @@ class MyApp extends StatelessWidget {
       providers: [
         ChangeNotifierProvider(create: (_) => HomeScreenProvider()),
         ChangeNotifierProvider(create: (_) => EditActivitiesProvider()),
+        ChangeNotifierProvider(create: (_) => EditUniversityProvider()),
+        ChangeNotifierProvider(create: (_) => EditEventsProvider()),
       ],
       child: MaterialApp(
         routes: {
@@ -32,6 +38,8 @@ class MyApp extends StatelessWidget {
           "/signUpScreen" : (context) => const SignUpScreen(),
           "/homeScreen" : (context) => const HomeScreen(),
           "/editActivities" : (context) => const EditActivities(),
+          "/editUniversity" : (context) => const EditUniversity(),
+          "/editEvents" : (context) => const EditEvents(),
         },
         title: 'Helper Guide',
         home: FutureBuilder(
