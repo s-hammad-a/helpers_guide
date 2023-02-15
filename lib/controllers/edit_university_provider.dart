@@ -36,7 +36,7 @@ class EditUniversityProvider extends ChangeNotifier{
   Future<void> getFromDatabase() async {
     activities = [];
     Query query = activitiesRef;
-    query.once().then((value) {
+    await query.once().then((value) {
       for (var element in value.snapshot.children) {
         activities.add(UniversityActivity.fromJson(element.value as Map));
       }

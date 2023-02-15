@@ -10,7 +10,6 @@ import 'package:provider/provider.dart';
 class StorageManager
 {
   Future<String?> uploadFile(String fileName, Uint8List fileBytes) async {
-    await FirebaseAuth.instance.signInAnonymously();
     print(await Permission.storage.request());
     print(await Permission.photos.request());
     print(await Permission.accessMediaLocation.request());

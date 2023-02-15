@@ -7,7 +7,7 @@ import 'package:helperguide/modules/activitiy.dart';
 
 class EditActivitiesProvider extends ChangeNotifier{
   List<Activity> activities = [];
-  final DatabaseReference activitiesRef = FirebaseDatabase.instance.reference().child('activities/');
+  final DatabaseReference activitiesRef = FirebaseDatabase.instance.reference().child('activities');
   late Uint8List tempImage ;
   bool imageLoaded = false;
   TextEditingController linkController = TextEditingController();
@@ -39,7 +39,7 @@ class EditActivitiesProvider extends ChangeNotifier{
   Future<void> getFromDatabase() async {
     activities = [];
     Query query = activitiesRef;
-    query.once().then((value) {
+    await query.once().then((value) {
       for (var element in value.snapshot.children) {
         activities.add(Activity.fromJson(element.value as Map));
       }

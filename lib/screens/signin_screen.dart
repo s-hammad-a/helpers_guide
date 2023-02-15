@@ -1,4 +1,9 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:helperguide/firebase/firebase_auth.dart';
+import 'package:provider/provider.dart';
+
+import '../controllers/signup_provider.dart';
 
 class SignInScreen extends StatelessWidget {
   const SignInScreen({Key? key}) : super(key: key);
@@ -52,6 +57,7 @@ class SignInScreen extends StatelessWidget {
                         Expanded(
                           child: TextButton(
                             onPressed: () {
+                              Provider.of<SignUpProvider>(context, listen: false).resetControllers();
                               Navigator.pop(context);
                               Navigator.pushNamed(context, '/signUpScreen');
                             },
@@ -80,6 +86,7 @@ class SignInScreen extends StatelessWidget {
                       ),
                       cursorColor: Colors.black,
                       textAlignVertical: TextAlignVertical.center,
+                      controller: context.watch<SignUpProvider>().email,
                       decoration: const InputDecoration(
                         filled: true,
                         fillColor: Colors.white,
@@ -109,6 +116,7 @@ class SignInScreen extends StatelessWidget {
                       cursorColor: Colors.black,
                       textAlignVertical: TextAlignVertical.center,
                       obscureText: true,
+                      controller: context.watch<SignUpProvider>().password,
                       decoration: const InputDecoration(
                         filled: true,
                         fillColor: Colors.white,
@@ -131,8 +139,44 @@ class SignInScreen extends StatelessWidget {
                   child: SizedBox(
                     width: 250,
                     child: TextButton(
-                      onPressed: () {
-                        Navigator.pushNamed(context, '/homeScreen');
+                      onPressed: () async {
+                        AuthService().signInWithEmailAndPassword(Provider.of<SignUpProvider>(context, listen: false).email.text, Provider.of<SignUpProvider>(context, listen: false).password.text).whenComplete(() {
+                          if(Provider.of<User?>(context, listen: false) == null) {
+                            showDialog(
+                              context: context,
+                              builder: (BuildContext context) {
+                                return AlertDialog(
+                                  backgroundColor: Colors.grey.shade200,
+                                  shape: const OutlineInputBorder(
+                                    borderSide: BorderSide(color: Color(0xFF242424), width: 1.0),
+                                    borderRadius: BorderRadius.all(Radius.circular(10.0)),
+                                  ),
+                                  content: const SizedBox(
+                                    width: 300,
+                                    child: Text(
+                                      'Incorrect Username/Password',
+                                      style: TextStyle(
+                                        fontSize: 18,
+                                        color: Colors.black,
+                                      ),
+                                    ),
+                                  ),
+                                  actions: [
+                                    ElevatedButton(
+                                      onPressed: () async {
+                                        Navigator.pop(context);
+                                      },
+                                      child: const Text('Try Again'),
+                                    ),
+                                  ],
+                                );
+                              },
+                            );
+                          }
+                          else {
+                            Provider.of<SignUpProvider>(context, listen: false).resetControllers();
+                          }
+                        });
                       },
                       style: const ButtonStyle(
                           backgroundColor: MaterialStatePropertyAll(Color(0xFF151A4F),)
@@ -154,6 +198,7 @@ class SignInScreen extends StatelessWidget {
                     width: 250,
                     child: TextButton(
                       onPressed: () {
+                        Provider.of<SignUpProvider>(context, listen: false).resetControllers();
                         Navigator.pop(context);
                         Navigator.pushNamed(context, '/signUpScreen');
                       },

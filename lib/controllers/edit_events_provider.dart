@@ -33,7 +33,7 @@ class EditEventsProvider extends ChangeNotifier{
   Future<void> getFromDatabase() async {
     events = [];
     Query query = eventsRef;
-    query.once().then((value) {
+    await query.once().then((value) {
       for (var element in value.snapshot.children) {
         events.add(Events.fromJson(element.value as Map));
       }
@@ -58,5 +58,8 @@ class EditEventsProvider extends ChangeNotifier{
     addToDatabase(Events(eventName: nameController.text, eventDetails: detailsController.text, date: date, startTime: startTime, endTime: endTime));
     print(events.length);
     notifyListeners();
+  }
+  bool getEvents(int index, DateTime current) {
+    return (events[index].date.year ==  current.year && events[index].date.month ==  current.month && events[index].date.day ==  current.day);
   }
 }

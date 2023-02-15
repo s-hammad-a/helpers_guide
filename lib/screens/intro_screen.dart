@@ -11,10 +11,6 @@ class IntroScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    Provider.of<EditUniversityProvider>(context, listen: false).getFromDatabase();
-    Provider.of<EditActivitiesProvider>(context, listen: false).getFromDatabase();
-    Provider.of<HomeScreenProvider>(context, listen: false).getFromDatabase();
-    Provider.of<EditEventsProvider>(context, listen: false).getFromDatabase();
     return Scaffold(
       body: Container(
         color: Colors.white,
@@ -131,7 +127,7 @@ class IntroScreen extends StatelessWidget {
                 Center(
                   child: FloatingActionButton(
                     onPressed: () {
-                      Navigator.pushNamed(context, '/signInScreen');
+                      Navigator.pushNamed(context, '/wrapper');
                     },
                     backgroundColor: const Color(0xFFA1C3FC),
                     child: const RotatedBox(
