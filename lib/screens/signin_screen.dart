@@ -175,6 +175,7 @@ class SignInScreen extends StatelessWidget {
                           }
                           else {
                             Provider.of<SignUpProvider>(context, listen: false).resetControllers();
+                            Navigator.pushNamed(context, "/wrapper");
                           }
                         });
                       },

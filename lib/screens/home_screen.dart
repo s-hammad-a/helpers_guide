@@ -131,540 +131,332 @@ class HomeScreen extends StatelessWidget {
       body: PageView(
         physics: const NeverScrollableScrollPhysics(),
         controller: context.watch<HomeScreenProvider>().controller,
-        children: [
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              Container(
-                padding: const EdgeInsets.all(20),
-                decoration: const BoxDecoration(
-                  color: Color(0xFF428DFC),
-                  borderRadius: BorderRadius.only(bottomLeft: Radius.circular(30), bottomRight: Radius.circular(30)),
-                ),
-                height: MediaQuery.of(context).size.height/4.5,
-                width: double.maxFinite,
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    const Expanded(child: SizedBox.shrink()),
-                    Text(
-                      " Hi ${user!.displayName == null ? "${user!.displayName}": ""} !",
-                      style: const TextStyle(
-                          color: Colors.white,
-                          fontSize: 20,
-                          fontWeight: FontWeight.bold
-                      ),
-                    ),
-                    const SizedBox(height: 10,),
-                    Row(
-                      crossAxisAlignment: CrossAxisAlignment.end,
-                      children: const [
-                        Icon(
-                          Icons.location_on,
-                          color: Colors.white,
-                          size: 30,
-                        ),
-                        Text(
-                          " Hafr Al-Batin University",
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 15,
-                          ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 20,),
-                  ],
-                ),
-              ),
-              const SizedBox(height: 10,),
-              Padding(
-                padding: const EdgeInsets.fromLTRB(30, 10, 30, 10),
-                child: SizedBox(
-                  height: 30,
-                  child: Row(
-                    children: [
-                      const Text(
-                        "Activities around you",
-                        style: TextStyle(
-                            color: Colors.black,
-                            fontSize: 15,
-                            fontWeight: FontWeight.bold
-                        ),
-                      ),
-                      const Expanded(child: SizedBox.shrink()),
-                      user!.email!.contains("helper.com") ? IconButton(
-                        splashRadius: 25,
-                        padding: EdgeInsets.zero,
-                        icon: const Icon(
-                          Icons.edit,
-                        ),
-                        onPressed: () {
-                          Navigator.pushNamed(context, "/editActivities");
-                        },
-                      ) : const SizedBox.shrink(),
-                    ],
-                  ),
-                ),
-              ),
-              Padding(
-                padding: const EdgeInsets.fromLTRB(30, 10, 30, 10),
-                child: FutureBuilder(
-                  future: Provider.of<EditActivitiesProvider>(context, listen: false).getFromDatabase(),
-                  builder: (BuildContext context, AsyncSnapshot<dynamic> snapshot) {
-                    if(snapshot.connectionState == ConnectionState.done) {
-                      return context.watch<EditActivitiesProvider>().activities.isNotEmpty ? const CardSwipe() : Container(height: 200,);
-                    }
-                    else {
-                      return const SizedBox(height: 200,);
-                    }
-                  },
-                ),
-                // child: ,
-              ),
-              Padding(
-                padding: const EdgeInsets.fromLTRB(30, 10, 30, 10),
-                child: SizedBox(
-                  height: 25,
-                  child: Row(
-                    children: [
-                      const Text(
-                        "University Information",
-                        style: TextStyle(
-                            color: Colors.black,
-                            fontSize: 15,
-                            fontWeight: FontWeight.bold
-                        ),
-                      ),
-                      const Expanded(child: SizedBox.shrink()),
-                      user.email!.contains("helper.com") ? IconButton(
-                        splashRadius: 25,
-                        padding: EdgeInsets.zero,
-                        icon: const Icon(
-                          Icons.edit,
-                        ),
-                        onPressed: () {
-                          Navigator.pushNamed(context, "/editUniversity");
-                        },
-                      ) : const SizedBox.shrink(),
-                    ],
-                  ),
-                ),
-              ),
-              const Expanded(child: UniversityInformation()),
-            ],
-          ),
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              Container(
-                padding: const EdgeInsets.all(20),
-                decoration: const BoxDecoration(
-                  color: Color(0xFF428DFC),
-                  borderRadius: BorderRadius.only(bottomLeft: Radius.circular(30), bottomRight: Radius.circular(30)),
-                ),
-                height: MediaQuery.of(context).size.height/4,
-                width: double.maxFinite,
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    const Expanded(child: SizedBox.shrink()),
-                    Row(
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: [
-                        Text(
-                          context.watch<HomeScreenProvider>().months[context.watch<HomeScreenProvider>().current.month],
-                          style: const TextStyle(
-                            color: Colors.white,
-                            fontSize: 20,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                        IconButton(
-                          onPressed: () async {
-                            DateTime? temp = await showDatePicker(
-                              context: context,
-                              initialDate: Provider.of<HomeScreenProvider>(context, listen: false).current,
-                              firstDate: DateTime.now().subtract(const Duration(days: 365)),
-                              lastDate: DateTime.now().add(const Duration(days: 365)),
-                            );
-                            Provider.of<HomeScreenProvider>(context, listen: false).setCurrentDate(temp!);
-                          },
-                          icon: const Icon(
-                            Icons.edit,
-                            color: Colors.white,
-                            size: 20,
-                          ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 10,),
-                    SizedBox(
-                      height: 60,
-                      child: ListView.builder(
-                        itemExtent: 65,
-                        controller: context.watch<HomeScreenProvider>().scrollController,
-                        padding: EdgeInsets.zero,
-                        scrollDirection: Axis.horizontal,
-                        itemCount: Provider.of<HomeScreenProvider>(context, listen: false).getNumberOfDays(),
-                        itemBuilder: (BuildContext context, int index) {
-                          return Row(
-                            children: [
-                              FloatingActionButton(
-                                shape: OutlineInputBorder(
-                                  borderSide: const BorderSide(color: Colors.black, width: 1),
-                                  borderRadius: BorderRadius.circular(200)
-                                ),
-                                backgroundColor: context.watch<HomeScreenProvider>().current.day == index + 1 ? Colors.red : Colors.white,
-                                onPressed: () {
-                                  Provider.of<HomeScreenProvider>(context, listen: false).changeDate(index+1);
-                                },
-                                child: Text(
-                                  (index+1).toString(),
-                                  style: const TextStyle(
-                                    color: Colors.black,
-                                  ),
-                                ),
-                              ),
-                              const SizedBox(width: 5,)
-                            ],
-                          );
-                        },
-
-                      ),
-
-                    )
-                  ],
-                ),
-              ),
-              const SizedBox(height: 10,),
-              Padding(
-                padding: const EdgeInsets.fromLTRB(30, 10, 30, 0),
-                child: SizedBox(
-                  height: 30,
-                  child: Row(
-                    children: [
-                      Text(
-                        "Events of ${context.watch<HomeScreenProvider>().current.day} ${context.watch<HomeScreenProvider>().months[context.watch<HomeScreenProvider>().current.month]}",
-                        style: const TextStyle(
-                            color: Colors.black,
-                            fontSize: 15,
-                            fontWeight: FontWeight.bold
-                        ),
-                      ),
-                      const Expanded(child: SizedBox.shrink()),
-                      user.email!.contains("helper.com") ? IconButton(
-                        splashRadius: 25,
-                        padding: EdgeInsets.zero,
-                        icon: const Icon(
-                          Icons.edit,
-                        ),
-                        onPressed: () {
-                          Navigator.pushNamed(context, "/editEvents");
-                        },
-                      ) : const SizedBox.shrink(),
-                    ],
-                  ),
-                ),
-              ),
-              Expanded(
-                child: Padding(
-                  padding: const EdgeInsets.fromLTRB(30, 0, 30, 10),
-                  child: FutureBuilder(
-                    future: Provider.of<EditEventsProvider>(context, listen: false).getFromDatabase(),
-                    builder: (BuildContext context, AsyncSnapshot<dynamic> snapshot) {
-                      if(snapshot.connectionState == ConnectionState.done) {
-                        return ListView.builder(
-                          itemCount: context.watch<EditEventsProvider>().events.length,
-                          itemBuilder: (BuildContext context, int index) {
-                            return Padding(
-                              padding: const EdgeInsets.all(5.0),
-                              child: Provider.of<EditEventsProvider>(context, listen: false).getEvents(index, context.watch<HomeScreenProvider>().current) ? EventCard(event: context.watch<EditEventsProvider>().events[index], index: index,) : const SizedBox.shrink(),
-                            );
-                          },
-                        );
-                      }
-                      else {
-                        return const SizedBox(height: 200,);
-                      }
-                    },
-                  ),
-                ),
-              ),
-            ],
-          ),
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              Container(
-                padding: const EdgeInsets.all(20),
-                decoration: const BoxDecoration(
-                  color: Color(0xFF428DFC),
-                  borderRadius: BorderRadius.only(bottomLeft: Radius.circular(30), bottomRight: Radius.circular(30)),
-                ),
-                height: MediaQuery.of(context).size.height/4.5,
-                width: double.maxFinite,
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: const [
-                    Expanded(child: SizedBox.shrink()),
-                    Text(
-                      " Hafr Al-Batin University",
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 20,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    SizedBox(height: 40,),
-                  ],
-                ),
-              ),
-              const SizedBox(height: 10,),
-              Padding(
-                padding: const EdgeInsets.only(right: 20, left: 20),
-                child: SizedBox(
-                  height: 30,
-                  child: Row(
-                    children: [
-                      user.email!.contains("helper.com") ? IconButton(
-                        splashRadius: 25,
-                        padding: EdgeInsets.zero,
-                        icon: const Icon(
-                          Icons.edit,
-                        ),
-                        onPressed: () {
-                          Navigator.pushNamed(context, "/editLocations");
-                        },
-                      ) : const SizedBox.shrink(),
-                      const Expanded(child: SizedBox.shrink()),
-                      Container(
-                        padding: const EdgeInsets.fromLTRB(10, 2, 10, 2),
-                        decoration: const BoxDecoration(
-                          color: Color(0xFFA1C3FC),
-                          borderRadius: BorderRadius.all(Radius.circular(20)),
-                        ),
-                        child: const Text(
-                          "مرافق مجمع الياسمين",
-                          style: TextStyle(
-                            fontSize: 15,
-                            color: Colors.black,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-              const SizedBox(height: 10,),
-              Expanded(
-                child: Padding(
-                  padding: const EdgeInsets.fromLTRB(30, 0, 30, 10),
-                  child: FutureBuilder(
-                    future: Provider.of<EditLocationsProvider>(context, listen: false).getFromDatabase(),
-                    builder: (BuildContext context, AsyncSnapshot<dynamic> snapshot) {
-                      if(snapshot.connectionState == ConnectionState.done) {
-                        return ListView.builder(
-                          itemCount: context.watch<EditLocationsProvider>().locations.length,
-                          itemBuilder: (BuildContext context, int index) {
-                            return Column(
-                              children: [
-                                LocationCard(location: context.watch<EditLocationsProvider>().locations[index], index: index,),
-                                const SizedBox(height: 5,),
-                              ],
-                            );
-                          },
-                        );
-                      }
-                      else {
-                        return const SizedBox(height: 200,);
-                      }
-                    },
-                  ),
-                ),
-              ),
-            ],
-          ),
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              Container(
-                padding: const EdgeInsets.all(20),
-                decoration: const BoxDecoration(
-                  color: Color(0xFF428DFC),
-                  borderRadius: BorderRadius.only(bottomLeft: Radius.circular(30), bottomRight: Radius.circular(30)),
-                ),
-                height: MediaQuery.of(context).size.height/3,
-                width: double.maxFinite,
-                child: Column(
-                  children: [
-                    const Expanded(child: SizedBox.shrink()),
-                    TextButton(
-                      onPressed: () async {
-                        FilePickerCross myFile = await FilePickerCross.importFromStorage();
-                        Uint8List fileBytes = myFile.toUint8List();
-                        String fileName = myFile.fileName!;
-                        StorageManager sm = StorageManager();
-                        String? location = await sm.uploadFile(fileName, fileBytes);
-                        if(location != null) {
-                          print(location);
-                          await user.updatePhotoURL(location);
-                          await user.reload();
-                          Provider.of<EditProfileProvider>(context, listen: false).updateImage(user);
-                          Provider.of<HomeScreenProvider>(context, listen: false).jumpToPage(3, user);
-                        }
-                      },
-                      child: user.photoURL == null ? const CircleAvatar(
-                        backgroundImage: AssetImage("assets/placeholder.png"),
-                        radius: 50,
-                      ) : CircleAvatar(
-                        backgroundImage: NetworkImage(context.watch<EditProfileProvider>().url == " " ? user.photoURL! : context.watch<EditProfileProvider>().url),
-                        radius: 50,
-                      ),
-                    ),
-                    TextButton(
-                      style: const ButtonStyle(
-                        fixedSize: MaterialStatePropertyAll(Size(140, 20)),
-                        backgroundColor: MaterialStatePropertyAll(Colors.black),
-                      ),
-                      onPressed: () async {
-                        FilePickerCross myFile = await FilePickerCross.importFromStorage();
-                        Uint8List fileBytes = myFile.toUint8List();
-                        String fileName = myFile.fileName!;
-                        StorageManager sm = StorageManager();
-                        String? location = await sm.uploadFile(fileName, fileBytes);
-                        if(location != null) {
-                          print(location);
-                          await user.updatePhotoURL(location);
-                          Provider.of<EditProfileProvider>(context, listen: false).updateImage(user);
-                        }
-                      },
-                      child: const Text(
-                        "Update Profile Pic",
-                        style: TextStyle(
-                          fontSize: 12,
-                          color: Colors.white,
-                        ),
-                      ),
-                    ),
-                    const SizedBox(height: 10,),
-                  ],
-                ),
-              ),
-              const SizedBox(height: 10,),
-              Padding(
-                padding: const EdgeInsets.fromLTRB(30, 30, 30, 5),
-                child: Row(
-                  children: [
-                    const SizedBox(
-                      width: 110,
-                      child: Text(
-                        "Full name: ",
-                        style: TextStyle(
-                          color: Colors.black,
-                          fontSize: 20,
-                        ),
-                      ),
-                    ),
-                    Expanded(
-                      child: Text(
-                        user.displayName != null ? user.displayName! : " ",
-                        style: const TextStyle(
-                          color: Colors.black,
-                          fontSize: 20,
-                        ),
-                        overflow: TextOverflow.visible,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              Padding(
-                padding: const EdgeInsets.fromLTRB(30, 30, 30, 5),
-                child: Row(
-                  children: [
-                    const SizedBox(
-                      width: 110,
-                      child: Text(
-                        "Email: ",
-                        style: TextStyle(
-                          color: Colors.black,
-                          fontSize: 20,
-                        ),
-                      ),
-                    ),
-                    Expanded(
-                      child: Text(
-                        user.email ??  " ",
-                        style: const TextStyle(
-                          color: Colors.black,
-                          fontSize: 20,
-                        ),
-                        overflow: TextOverflow.visible,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              Padding(
-                padding: const EdgeInsets.fromLTRB(30, 30, 30, 5),
-                child: Row(
-                  children: [
-                    const SizedBox(
-                      width: 110,
-                      child: Text(
-                        "Role: ",
-                        style: TextStyle(
-                          color: Colors.black,
-                          fontSize: 20,
-                        ),
-                      ),
-                    ),
-                    Expanded(
-                      child: Text(
-                        user.email!.contains("@helper.com") ? "Admin" : user.email!.contains("@uhb.edu.sa") ? "User": "Visitor",
-                        style: const TextStyle(
-                          color: Colors.black,
-                          fontSize: 20,
-                          overflow: TextOverflow.visible,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              const Expanded(child: SizedBox.shrink()),
-              Padding(
-                padding: const EdgeInsets.fromLTRB(30, 10, 30, 10),
-                child: SizedBox(
-                  width: 250,
-                  child: TextButton(
-                    onPressed: () async {
-                      AuthService().signOut();
-                    },
-                    style: const ButtonStyle(
-                        backgroundColor: MaterialStatePropertyAll(Color(0xFF151A4F),)
-                    ),
-                    child: const Text(
-                      "Sign Out",
-                      textAlign: TextAlign.center,
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 15,
-                      ),
-                    ),
-                  ),
-                ),
-              ),
-              const SizedBox(height: 10,),
-            ],
-          ),
+        children: const [
+          HomePage(),
+          CalenderScreen(),
+          LocationScreen(),
+          AccountScreen(),
         ],
       ),
     );
   }
 }
+
+class HomePage extends StatelessWidget {
+  const HomePage({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    User? user = Provider.of<User?>(context);
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        Container(
+          padding: const EdgeInsets.all(20),
+          decoration: const BoxDecoration(
+            color: Color(0xFF428DFC),
+            borderRadius: BorderRadius.only(bottomLeft: Radius.circular(30), bottomRight: Radius.circular(30)),
+          ),
+          height: MediaQuery.of(context).size.height/4.5,
+          width: double.maxFinite,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              const Expanded(child: SizedBox.shrink()),
+              Text(
+                " Hi ${user!.displayName == null ? "${user!.displayName}": ""} !",
+                style: const TextStyle(
+                    color: Colors.white,
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold
+                ),
+              ),
+              const SizedBox(height: 10,),
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.end,
+                children: const [
+                  Icon(
+                    Icons.location_on,
+                    color: Colors.white,
+                    size: 30,
+                  ),
+                  Text(
+                    " Hafr Al-Batin University",
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 15,
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 20,),
+            ],
+          ),
+        ),
+        const SizedBox(height: 10,),
+        Padding(
+          padding: const EdgeInsets.fromLTRB(30, 10, 30, 10),
+          child: SizedBox(
+            height: 30,
+            child: Row(
+              children: [
+                const Text(
+                  "Activities around you",
+                  style: TextStyle(
+                      color: Colors.black,
+                      fontSize: 15,
+                      fontWeight: FontWeight.bold
+                  ),
+                ),
+                const Expanded(child: SizedBox.shrink()),
+                user!.email!.contains("helper.com") ? IconButton(
+                  splashRadius: 25,
+                  padding: EdgeInsets.zero,
+                  icon: const Icon(
+                    Icons.edit,
+                  ),
+                  onPressed: () {
+                    Navigator.pushNamed(context, "/editActivities");
+                  },
+                ) : const SizedBox.shrink(),
+              ],
+            ),
+          ),
+        ),
+        Padding(
+          padding: const EdgeInsets.fromLTRB(30, 10, 30, 10),
+          child: FutureBuilder(
+            future: Provider.of<EditActivitiesProvider>(context, listen: false).getFromDatabase(),
+            builder: (BuildContext context, AsyncSnapshot<dynamic> snapshot) {
+              if(snapshot.connectionState == ConnectionState.done) {
+                return context.watch<EditActivitiesProvider>().activities.isNotEmpty ? const CardSwipe() : Container(height: 200,);
+              }
+              else {
+                return const SizedBox(height: 200,);
+              }
+            },
+          ),
+          // child: ,
+        ),
+        Padding(
+          padding: const EdgeInsets.fromLTRB(30, 10, 30, 10),
+          child: SizedBox(
+            height: 25,
+            child: Row(
+              children: [
+                const Text(
+                  "University Information",
+                  style: TextStyle(
+                      color: Colors.black,
+                      fontSize: 15,
+                      fontWeight: FontWeight.bold
+                  ),
+                ),
+                const Expanded(child: SizedBox.shrink()),
+                user.email!.contains("helper.com") ? IconButton(
+                  splashRadius: 25,
+                  padding: EdgeInsets.zero,
+                  icon: const Icon(
+                    Icons.edit,
+                  ),
+                  onPressed: () {
+                    Navigator.pushNamed(context, "/editUniversity");
+                  },
+                ) : const SizedBox.shrink(),
+              ],
+            ),
+          ),
+        ),
+        const Expanded(child: UniversityInformation()),
+      ],
+    );
+  }
+}
+
+
+class AccountScreen extends StatelessWidget {
+  const AccountScreen({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    User? user = Provider.of<User?>(context);
+    return Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Container(
+            padding: const EdgeInsets.all(20),
+            decoration: const BoxDecoration(
+              color: Color(0xFF428DFC),
+              borderRadius: BorderRadius.only(bottomLeft: Radius.circular(30), bottomRight: Radius.circular(30)),
+            ),
+            height: MediaQuery.of(context).size.height/3,
+            width: double.maxFinite,
+            child: Column(
+              children: [
+                const Expanded(child: SizedBox.shrink()),
+                TextButton(
+                  onPressed: () async {
+                    FilePickerCross myFile = await FilePickerCross.importFromStorage();
+                    Uint8List fileBytes = myFile.toUint8List();
+                    String fileName = myFile.fileName!;
+                    StorageManager sm = StorageManager();
+                    String? location = await sm.uploadFile(fileName, fileBytes);
+                    if(location != null) {
+                      print(location);
+                      await user!.updatePhotoURL(location);
+                      await user.reload();
+                      Provider.of<EditProfileProvider>(context, listen: false).updateImage(user);
+                      Provider.of<HomeScreenProvider>(context, listen: false).jumpToPage(3, user);
+                    }
+                  },
+                  child: user!.photoURL == null ? const CircleAvatar(
+                    backgroundImage: AssetImage("assets/placeholder.png"),
+                    radius: 50,
+                  ) : CircleAvatar(
+                    backgroundImage: NetworkImage(context.watch<EditProfileProvider>().url == " " ? user.photoURL! : context.watch<EditProfileProvider>().url),
+                    radius: 50,
+                  ),
+                ),
+                TextButton(
+                  style: const ButtonStyle(
+                    fixedSize: MaterialStatePropertyAll(Size(140, 20)),
+                    backgroundColor: MaterialStatePropertyAll(Colors.black),
+                  ),
+                  onPressed: () async {
+                    FilePickerCross myFile = await FilePickerCross.importFromStorage();
+                    Uint8List fileBytes = myFile.toUint8List();
+                    String fileName = myFile.fileName!;
+                    StorageManager sm = StorageManager();
+                    String? location = await sm.uploadFile(fileName, fileBytes);
+                    if(location != null) {
+                      print(location);
+                      await user.updatePhotoURL(location);
+                      Provider.of<EditProfileProvider>(context, listen: false).updateImage(user);
+                    }
+                  },
+                  child: const Text(
+                    "Update Profile Pic",
+                    style: TextStyle(
+                      fontSize: 12,
+                      color: Colors.white,
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 10,),
+              ],
+            ),
+          ),
+          const SizedBox(height: 10,),
+          Padding(
+            padding: const EdgeInsets.fromLTRB(30, 30, 30, 5),
+            child: Row(
+              children: [
+                const SizedBox(
+                  width: 110,
+                  child: Text(
+                    "Full name: ",
+                    style: TextStyle(
+                      color: Colors.black,
+                      fontSize: 20,
+                    ),
+                  ),
+                ),
+                Expanded(
+                  child: Text(
+                    user.displayName != null ? user.displayName! : " ",
+                    style: const TextStyle(
+                      color: Colors.black,
+                      fontSize: 20,
+                    ),
+                    overflow: TextOverflow.visible,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.fromLTRB(30, 30, 30, 5),
+            child: Row(
+              children: [
+                const SizedBox(
+                  width: 110,
+                  child: Text(
+                    "Email: ",
+                    style: TextStyle(
+                      color: Colors.black,
+                      fontSize: 20,
+                    ),
+                  ),
+                ),
+                Expanded(
+                  child: Text(
+                    user.email ??  " ",
+                    style: const TextStyle(
+                      color: Colors.black,
+                      fontSize: 20,
+                    ),
+                    overflow: TextOverflow.visible,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.fromLTRB(30, 30, 30, 5),
+            child: Row(
+              children: [
+                const SizedBox(
+                  width: 110,
+                  child: Text(
+                    "Role: ",
+                    style: TextStyle(
+                      color: Colors.black,
+                      fontSize: 20,
+                    ),
+                  ),
+                ),
+                Expanded(
+                  child: Text(
+                    user.email!.contains("@helper.com") ? "Admin" : user.email!.contains("@uhb.edu.sa") ? "User": "Visitor",
+                    style: const TextStyle(
+                      color: Colors.black,
+                      fontSize: 20,
+                      overflow: TextOverflow.visible,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+          const Expanded(child: SizedBox.shrink()),
+          Padding(
+            padding: const EdgeInsets.fromLTRB(30, 10, 30, 10),
+            child: SizedBox(
+              width: 250,
+              child: TextButton(
+                onPressed: () async {
+                  AuthService().signOut();
+                },
+                style: const ButtonStyle(
+                    backgroundColor: MaterialStatePropertyAll(Color(0xFF151A4F),)
+                ),
+                child: const Text(
+                  "Sign Out",
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 15,
+                  ),
+                ),
+              ),
+            ),
+          ),
+          const SizedBox(height: 10,),
+        ],
+      );
+  }
+}
+
 
 class LocationCard extends StatelessWidget {
   const LocationCard({Key? key, required this.location, required this.index}) : super(key: key);
@@ -872,9 +664,6 @@ class CardSwipe extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      decoration: BoxDecoration(
-          border: Border.all(color: Colors.black)
-      ),
       height: 200,
       child: Swiper.children(
         indicatorLayout: PageIndicatorLayout.COLOR,
@@ -946,5 +735,256 @@ class EventCard extends StatelessWidget {
         ),
       ),
     );
+  }
+}
+
+class CalenderScreen extends StatelessWidget {
+  const CalenderScreen({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    User? user = Provider.of<User?>(context);
+    return Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Container(
+            padding: const EdgeInsets.all(20),
+            decoration: const BoxDecoration(
+              color: Color(0xFF428DFC),
+              borderRadius: BorderRadius.only(bottomLeft: Radius.circular(30), bottomRight: Radius.circular(30)),
+            ),
+            height: MediaQuery.of(context).size.height/4,
+            width: double.maxFinite,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                const Expanded(child: SizedBox.shrink()),
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    Text(
+                      context.watch<HomeScreenProvider>().months[context.watch<HomeScreenProvider>().current.month],
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    IconButton(
+                      onPressed: () async {
+                        DateTime? temp = await showDatePicker(
+                          context: context,
+                          initialDate: Provider.of<HomeScreenProvider>(context, listen: false).current,
+                          firstDate: DateTime.now().subtract(const Duration(days: 365)),
+                          lastDate: DateTime.now().add(const Duration(days: 365)),
+                        );
+                        Provider.of<HomeScreenProvider>(context, listen: false).setCurrentDate(temp!);
+                      },
+                      icon: const Icon(
+                        Icons.edit,
+                        color: Colors.white,
+                        size: 20,
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 10,),
+                SizedBox(
+                  height: 60,
+                  child: ListView.builder(
+                    itemExtent: 65,
+                    controller: context.watch<HomeScreenProvider>().scrollController,
+                    padding: EdgeInsets.zero,
+                    scrollDirection: Axis.horizontal,
+                    itemCount: Provider.of<HomeScreenProvider>(context, listen: false).getNumberOfDays(),
+                    itemBuilder: (BuildContext context, int index) {
+                      return Row(
+                        children: [
+                          FloatingActionButton(
+                            shape: OutlineInputBorder(
+                                borderSide: const BorderSide(color: Colors.black, width: 1),
+                                borderRadius: BorderRadius.circular(200)
+                            ),
+                            backgroundColor: context.watch<HomeScreenProvider>().current.day == index + 1 ? Colors.red : Colors.white,
+                            onPressed: () {
+                              Provider.of<HomeScreenProvider>(context, listen: false).changeDate(index+1);
+                            },
+                            child: Text(
+                              (index+1).toString(),
+                              style: const TextStyle(
+                                color: Colors.black,
+                              ),
+                            ),
+                          ),
+                          const SizedBox(width: 5,)
+                        ],
+                      );
+                    },
+
+                  ),
+
+                )
+              ],
+            ),
+          ),
+          const SizedBox(height: 10,),
+          Padding(
+            padding: const EdgeInsets.fromLTRB(30, 10, 30, 0),
+            child: SizedBox(
+              height: 30,
+              child: Row(
+                children: [
+                  Text(
+                    "Events of ${context.watch<HomeScreenProvider>().current.day} ${context.watch<HomeScreenProvider>().months[context.watch<HomeScreenProvider>().current.month]}",
+                    style: const TextStyle(
+                        color: Colors.black,
+                        fontSize: 15,
+                        fontWeight: FontWeight.bold
+                    ),
+                  ),
+                  const Expanded(child: SizedBox.shrink()),
+                  user!.email!.contains("helper.com") ? IconButton(
+                    splashRadius: 25,
+                    padding: EdgeInsets.zero,
+                    icon: const Icon(
+                      Icons.edit,
+                    ),
+                    onPressed: () {
+                      Navigator.pushNamed(context, "/editEvents");
+                    },
+                  ) : const SizedBox.shrink(),
+                ],
+              ),
+            ),
+          ),
+          Expanded(
+            child: Padding(
+              padding: const EdgeInsets.fromLTRB(30, 0, 30, 10),
+              child: FutureBuilder(
+                future: Provider.of<EditEventsProvider>(context, listen: false).getFromDatabase(),
+                builder: (BuildContext context, AsyncSnapshot<dynamic> snapshot) {
+                  if(snapshot.connectionState == ConnectionState.done) {
+                    return ListView.builder(
+                      itemCount: context.watch<EditEventsProvider>().events.length,
+                      itemBuilder: (BuildContext context, int index) {
+                        return Padding(
+                          padding: const EdgeInsets.all(5.0),
+                          child: Provider.of<EditEventsProvider>(context, listen: false).getEvents(index, context.watch<HomeScreenProvider>().current) ? EventCard(event: context.watch<EditEventsProvider>().events[index], index: index,) : const SizedBox.shrink(),
+                        );
+                      },
+                    );
+                  }
+                  else {
+                    return const SizedBox(height: 200,);
+                  }
+                },
+              ),
+            ),
+          ),
+        ],
+      );
+  }
+}
+
+
+class LocationScreen extends StatelessWidget {
+  const LocationScreen({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    User? user = Provider.of<User?>(context);
+    return Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Container(
+            padding: const EdgeInsets.all(20),
+            decoration: const BoxDecoration(
+              color: Color(0xFF428DFC),
+              borderRadius: BorderRadius.only(bottomLeft: Radius.circular(30), bottomRight: Radius.circular(30)),
+            ),
+            height: MediaQuery.of(context).size.height/4.5,
+            width: double.maxFinite,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: const [
+                Expanded(child: SizedBox.shrink()),
+                Text(
+                  " Hafr Al-Batin University",
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                SizedBox(height: 40,),
+              ],
+            ),
+          ),
+          const SizedBox(height: 10,),
+          Padding(
+            padding: const EdgeInsets.only(right: 20, left: 20),
+            child: SizedBox(
+              height: 30,
+              child: Row(
+                children: [
+                  user!.email!.contains("helper.com") ? IconButton(
+                    splashRadius: 25,
+                    padding: EdgeInsets.zero,
+                    icon: const Icon(
+                      Icons.edit,
+                    ),
+                    onPressed: () {
+                      Navigator.pushNamed(context, "/editLocations");
+                    },
+                  ) : const SizedBox.shrink(),
+                  const Expanded(child: SizedBox.shrink()),
+                  Container(
+                    padding: const EdgeInsets.fromLTRB(10, 2, 10, 2),
+                    decoration: const BoxDecoration(
+                      color: Color(0xFFA1C3FC),
+                      borderRadius: BorderRadius.all(Radius.circular(20)),
+                    ),
+                    child: const Text(
+                      "مرافق مجمع الياسمين",
+                      style: TextStyle(
+                        fontSize: 15,
+                        color: Colors.black,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+          const SizedBox(height: 10,),
+          Expanded(
+            child: Padding(
+              padding: const EdgeInsets.fromLTRB(30, 0, 30, 10),
+              child: FutureBuilder(
+                future: Provider.of<EditLocationsProvider>(context, listen: false).getFromDatabase(),
+                builder: (BuildContext context, AsyncSnapshot<dynamic> snapshot) {
+                  if(snapshot.connectionState == ConnectionState.done) {
+                    return ListView.builder(
+                      itemCount: context.watch<EditLocationsProvider>().locations.length,
+                      itemBuilder: (BuildContext context, int index) {
+                        return Column(
+                          children: [
+                            LocationCard(location: context.watch<EditLocationsProvider>().locations[index], index: index,),
+                            const SizedBox(height: 5,),
+                          ],
+                        );
+                      },
+                    );
+                  }
+                  else {
+                    return const SizedBox(height: 200,);
+                  }
+                },
+              ),
+            ),
+          ),
+        ],
+      );
   }
 }

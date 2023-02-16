@@ -193,6 +193,7 @@ class SignUpScreen extends StatelessWidget {
                           AuthService().registerWithEmailAndPassword(Provider.of<SignUpProvider>(context, listen: false).email.text, Provider.of<SignUpProvider>(context, listen: false).password.text, Provider.of<SignUpProvider>(context, listen: false).fullName.text).whenComplete(() {
                             AuthService().signInWithEmailAndPassword(Provider.of<SignUpProvider>(context, listen: false).email.text, Provider.of<SignUpProvider>(context, listen: false).password.text).whenComplete(() {
                               Provider.of<SignUpProvider>(context, listen: false).resetControllers();
+                              Navigator.pushNamed(context, "/wrapper");
                             });
                           });
                         }

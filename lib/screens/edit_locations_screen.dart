@@ -56,8 +56,8 @@ class EditLocations extends StatelessWidget {
                 icon: const Icon(
                   Icons.edit,
                 ),
-                onPressed: () {
-                  showDialog(
+                onPressed: () async {
+                  await showDialog(
                     context: context,
                     builder: (BuildContext newContext) {
                       return AlertDialog(
@@ -182,26 +182,46 @@ class EditLocations extends StatelessWidget {
               const SizedBox(width: 10,),
             ],
           ),
-          Expanded(
-            child: ListView.builder(
-              padding: const EdgeInsets.fromLTRB(20, 5, 20, 5),
-              itemCount: context.watch<EditLocationsProvider>().locations.length,
-              itemBuilder: (BuildContext context, int index) {
-                return Column(
-                  children: [
-                    LocationCard(location: context.watch<EditLocationsProvider>().locations[index], index: index,),
-                    const SizedBox(height: 5,),
-                  ],
-                );
-              },
-            ),
-          ),
+          const ListLocations(),
           const SizedBox(height: 10,),
         ],
       ),
     );
   }
 }
+
+class ListLocations extends StatelessWidget {
+  const ListLocations({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Expanded(
+        child: FutureBuilder(
+          future: Provider.of<EditLocationsProvider>(context, listen: false).getFromDatabase(),
+          builder: (BuildContext context, AsyncSnapshot<dynamic> snapshot) {
+            if(snapshot.connectionState == ConnectionState.done) {
+              return ListView.builder(
+                padding: const EdgeInsets.fromLTRB(20, 5, 20, 5),
+                itemCount: context.watch<EditLocationsProvider>().locations.length,
+                itemBuilder: (BuildContext context, int index) {
+                  return Column(
+                    children: [
+                      LocationCard(location: context.watch<EditLocationsProvider>().locations[index], index: index,),
+                      const SizedBox(height: 5,),
+                    ],
+                  );
+                },
+              );
+            }
+            else {
+              return const SizedBox(height: 200,);
+            }
+          },
+        ),
+      );
+  }
+}
+
 
 class LocationCard extends StatelessWidget {
   const LocationCard({Key? key, required this.location, required this.index}) : super(key: key);

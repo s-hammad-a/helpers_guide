@@ -23,7 +23,7 @@ class EditLocationsProvider extends ChangeNotifier{
     }
     notifyListeners();
   }
-  void addToDatabase(Location location) async {
+  Future<void> addToDatabase(Location location) async {
     locations.add(location);
     await locationsRef.push().set(location.toJson());
   }
@@ -35,9 +35,10 @@ class EditLocationsProvider extends ChangeNotifier{
         locations.add(Location.fromJson(element.value as Map));
       }
     });
+    notifyListeners();
   }
-  void addLocation() {
-    addToDatabase(Location(name: nameController.text, details: detailsController.text, link: linkController.text));
+  void addLocation() async {
+    await addToDatabase(Location(name: nameController.text, details: detailsController.text, link: linkController.text));
     notifyListeners();
   }
   // bool getlocations(int index, DateTime current) {
